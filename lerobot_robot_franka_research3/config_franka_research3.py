@@ -93,17 +93,45 @@ class FrankaResearch3Config(RobotConfig):
     # When False, no nullspace target is sent (nullspace_stiffness then has no
     # effect even if non-zero).
     cartesian_use_home_as_nullspace_target: bool = True
-    # Per-cycle limit on the change in commanded joint torque [Nm]. Lower
-    # values smooth out reference jumps but slow tracking response. The 0.3
-    # default is the single biggest jitter knob for stepped teleop input.
-    cartesian_max_delta_tau: float = 0.3                # was 1.0
-    # Time constant for the gains-handle smoothing in the RT loop [s].
-    cartesian_gains_time_constant: float = 0.1
-    # Optional first-order low-pass on the Cartesian target before it's
-    # pushed into the reference handle. alpha in (0, 1]; 1.0 = no filter,
-    # smaller = stronger smoothing. 0.4 takes the edge off pico4's 30Hz
-    # step input without adding noticeable lag.
-    cartesian_target_filter_alpha: float = 0.4
+    # Per-cycle limit on the change in commanded joint torque [Nm].
+    # This is applied inside the 1 kHz torque loop, so it directly limits how
+    # abruptly the commanded joint torques can change from one control tick to
+    # the next. It is the main knob for audible buzz / jitter when Pico4 sends
+    # stepped 30 Hz targets.
+    #
+    #   lower values: smoother and quieter, less likely to hit Reflex, but the
+    #                 end effector feels softer and follows targets more slowly
+    #   higher values: faster and stiffer tracking, but more vibration/noise
+    #                  and a higher chance of torque-discontinuity faults
+    #
+    # Practical range for Pico4 teleop: 0.3 ~ 1.0.  Use 0.3 ~ 0.5 if the arm
+    # buzzes or jitters; use 0.8 ~ 1.0 only when the input target is already
+    # smooth enough and you want a more responsive feel.
+    cartesian_max_delta_tau: float = 1.0                # was 1.0
+    # Time constant for smoothing impedance gain changes in the real-time loop
+    # [s]. This affects changes to stiffness/nullspace gains, not the streamed
+    # Cartesian target itself. The real-time controller interpolates from the
+    # current gains to the requested gains with this time constant.
+    #
+    #   lower values: gain changes take effect faster, but can feel more abrupt
+    #   higher values: gain changes are gentler, but take longer to settle
+    #
+    # Typical range: 0.05 ~ 0.2.  This can usually stay fixed unless you are
+    # changing stiffness online during teleop.
+    cartesian_gains_time_constant: float = 0.05
+    # Optional first-order low-pass on the Cartesian target before it is pushed
+    # into the reference handle. This filters the target pose coming from Pico4
+    # before the 1 kHz impedance controller sees it.
+    #
+    #   alpha = 1.0: no filtering; most responsive, but Pico4's 30 Hz target
+    #                updates are seen as hard steps and may cause buzz/jitter
+    #   alpha < 1.0: exponential smoothing; smaller values are smoother but add
+    #                more visible lag
+    #
+    # Practical range for Pico4 teleop: 0.3 ~ 1.0.  Use 0.4 ~ 0.6 for a stable
+    # default, 0.8 ~ 1.0 for a more direct feel, and 0.2 ~ 0.3 only when you
+    # need extra smoothing and can tolerate latency.
+    cartesian_target_filter_alpha: float = 1.0
 
     # Connection behavior
     go_to_start: bool = (
