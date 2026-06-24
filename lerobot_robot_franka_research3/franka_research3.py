@@ -26,7 +26,7 @@ from franky import (
     Twist,
 )
 
-from lerobot.utils.robot_utils import (
+from .robot_utils import (
     matrix_to_pose7d,
     quaternion_to_euler,
     rotation_6d_to_quaternion,

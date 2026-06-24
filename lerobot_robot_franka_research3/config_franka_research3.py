@@ -8,7 +8,6 @@ from lerobot.robots.config import RobotConfig
 from lerobot.cameras.configs import ColorMode
 from .config_serial_gripper import SerialGripperConfig
 from lerobot.cameras.opencv import OpenCVCameraConfig
-from lerobot.cameras.xense import XenseOutputType, XenseTactileCameraConfig
 
 class ControlMode(str, Enum):
     """Control mode for Flexiv Rizon4.
@@ -253,6 +252,15 @@ class FrankaResearch3Config(RobotConfig):
             )
 
         if self.use_gripper and self.enable_gripper_tactile_sensors:
+            try:
+                from lerobot.cameras.xense import XenseOutputType, XenseTactileCameraConfig
+            except ModuleNotFoundError as exc:
+                raise ModuleNotFoundError(
+                    "lerobot.cameras.xense is required when "
+                    "enable_gripper_tactile_sensors=true. Install the Xense camera "
+                    "support package or run with --robot.enable_gripper_tactile_sensors=false."
+                ) from exc
+
             self.cameras.update(
                 {
                     "tactile_0": XenseTactileCameraConfig(
