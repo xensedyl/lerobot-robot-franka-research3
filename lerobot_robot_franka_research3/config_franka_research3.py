@@ -139,10 +139,11 @@ class FrankaResearch3Config(RobotConfig):
     )
 
     # Home position for robot (7 joint angles in radians)
-    # robot_home_position: list = field(default_factory=lambda: [-0.030264, -0.523095, -0.091621, -2.812467, -0.089465,  2.25039,   0.709976])
-    # robot_home_position: list = field(default_factory=lambda: [-0.08211147, -0.6067168,  -0.03138583, -2.7927575,  -0.02443479,  2.211011, 0.67388374])
-    robot_home_position: list = field(default_factory=lambda: [ -0.09385, -0.17559,  0.02542, -2.05487,  0.028,    1.88188, -0.89032 ])
-    
+    # 左手心朝下，手指超前姿势
+    # robot_home_position: list = field(default_factory=lambda: [ -0.09385, -0.17559,  0.02542, -2.05487,  0.028,    1.88188, -0.89032 ])
+    # 左手心朝右，手指超前姿势
+    robot_home_position: list = field(default_factory=lambda: [ 0.40894 , 0.12128 , 0.0336 , -2.28866 , -1.10764 , 1.11151 , 0.2806 ])
+
     # ======================== Xense Gripper Configuration ========================
 
     # Whether to use the gripper
