@@ -28,6 +28,28 @@ git@github.com:xensedyl/franky.git
 The Python distribution name is `franky-control`, and the import module is
 `franky`.
 
+### Install Franky From A Local Checkout
+
+If you use a local `franky` checkout, initialize its git submodules before
+installing it. The `ruckig` submodule is required by CMake; an empty `ruckig/`
+directory will fail with `does not contain a CMakeLists.txt file`.
+
+```bash
+cd franky
+git submodule update --init --recursive
+pip install -e . --no-build-isolation
+```
+
+Use `--no-build-isolation` when `cmake` is installed from the Python `cmake`
+package. Otherwise pip's isolated build environment can fail with
+`ModuleNotFoundError: No module named 'cmake'` while running `cmake --version`.
+
+When cloning `franky` from scratch, clone submodules in the same step:
+
+```bash
+git clone --recursive git@github.com:xensedyl/franky.git
+```
+
 ### Install Franky From Git
 
 You can also install the fork directly:

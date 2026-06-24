@@ -25,6 +25,28 @@ git@github.com:xensedyl/franky.git
 
 Python 包名是 `franky-control`，import 模块名是 `franky`。
 
+### 从本地源码安装 franky
+
+如果使用本地 `franky` 源码，安装前必须先初始化 git submodule。
+其中 `ruckig` 是 CMake 必需的子模块；如果 `ruckig/` 是空目录，会报
+`does not contain a CMakeLists.txt file`。
+
+```bash
+cd franky
+git submodule update --init --recursive
+pip install -e . --no-build-isolation
+```
+
+如果当前环境里的 `cmake` 来自 Python `cmake` 包，建议带
+`--no-build-isolation`。否则 pip 的隔离构建环境里可能在执行
+`cmake --version` 时出现 `ModuleNotFoundError: No module named 'cmake'`。
+
+如果是重新 clone `franky`，可以直接带上 submodule：
+
+```bash
+git clone --recursive git@github.com:xensedyl/franky.git
+```
+
 ### 直接从 Git 安装 franky
 
 ```bash
