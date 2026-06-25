@@ -140,6 +140,51 @@ Optional absolute limits can also be set:
 --robot.joint_velocity_limit='[1.0,1.0,1.0,1.0,1.0,1.0,1.0]'
 ```
 
+## Qt GUI Debug Tool
+
+`franka_qt/franky_qt.py` is a PySide6 GUI for manually debugging the robot:
+read the current pose/joints, jog in Cartesian space (XYZ translation and
+rotation about XYZ), reset to preset poses, control the gripper, emergency
+stop, and clear errors.
+
+### Dependencies
+
+```bash
+pip install PySide6 numpy scipy requests
+```
+
+Robot control relies on `franky` (see the installation steps above).
+`franka_qt.ui` must live in the same directory as `franky_qt.py`.
+
+### Run
+
+```bash
+cd franka_qt
+python franky_qt.py
+```
+
+The GUI connects directly to `FRANKA_IP` (defaults to `192.168.99.111` in the
+script); edit the constant at the top of the script if yours differs.
+
+### Gripper HTTP Service
+
+The gripper is controlled over HTTP at `GRIPPER_URL` (defaults to
+`http://127.0.0.1:7001`):
+
+- `POST /move` with params `pos`, `vmax`, `fmax`
+- `GET /get_pos` returning `{"position": ...}`
+
+Start the corresponding gripper HTTP service before using the gripper buttons.
+
+### Troubleshooting
+
+- **`No module named 'rclpy._rclpy_pybind11'`**: the script no longer depends on
+  ROS, so this can be ignored.
+- **`Could not find the Qt platform plugin "xcb"`**: usually a version clash
+  between a conda-installed `qt6-main` and the pip-installed PySide6. The top of
+  the script automatically points the Qt plugin path to PySide6's bundled
+  plugins to work around this.
+
 ## Notes
 
 Before moving a physical Franka, verify that:

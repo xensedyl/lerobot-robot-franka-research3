@@ -131,6 +131,46 @@ lerobot-teleoperate \
 --robot.joint_velocity_limit='[1.0,1.0,1.0,1.0,1.0,1.0,1.0]'
 ```
 
+## Qt 图形界面调试工具
+
+`franka_qt/franky_qt.py` 提供一个基于 PySide6 的图形界面，用于手动调试机械臂：
+读取当前位姿/关节、笛卡尔点动（XYZ 平移 + 绕 XYZ 旋转）、复位到预设位姿、
+控制夹爪开合、急停和清除错误。
+
+### 依赖
+
+```bash
+pip install PySide6 numpy scipy requests
+```
+
+机械臂控制依赖 `franky`（安装方式见上文）。`franka_qt.ui` 必须与
+`franky_qt.py` 放在同一目录。
+
+### 运行
+
+```bash
+cd franka_qt
+python franky_qt.py
+```
+
+界面会直接连接 `FRANKA_IP`（脚本内默认 `192.168.99.111`），如有不同请修改脚本顶部常量。
+
+### 夹爪 HTTP 服务
+
+夹爪通过 HTTP 控制，脚本默认访问 `GRIPPER_URL`（默认 `http://127.0.0.1:7001`）：
+
+- `POST /move`，参数 `pos`、`vmax`、`fmax`
+- `GET /get_pos`，返回 `{"position": ...}`
+
+使用夹爪相关按钮前，需要先启动对应的夹爪 HTTP 服务。
+
+### 常见问题
+
+- **`No module named 'rclpy._rclpy_pybind11'`**：脚本已不依赖 ROS，无需处理。
+- **`Could not find the Qt platform plugin "xcb"`**：通常是 conda 安装的
+  `qt6-main` 与 pip 安装的 PySide6 版本冲突。脚本顶部已自动把 Qt 插件路径
+  指向 PySide6 自带目录来规避此问题。
+
 ## 注意
 
 真机运动前确认：
