@@ -546,8 +546,27 @@ class FrankaResearch3(Robot):
             time.sleep(0.1)  # Wait for motion to complete
         except Exception as e:
             logger.warning(f"Error sending robot action: {e}")
-            self.robot.recover_from_errors()
-            logger.info("🚨 Robot recovered from Reflex mode")
+            try:
+                self.robot.stop()
+            except Exception as stop_err:
+                logger.warning(f"robot.stop() before retrying start failed: {stop_err}")
+            try:
+                self.robot.join_motion()
+            except Exception as join_err:
+                logger.warning(f"robot.join_motion() before retrying start failed: {join_err}")
+            try:
+                if getattr(self.robot, "has_errors", False):
+                    self.robot.recover_from_errors()
+                    logger.info("🚨 Robot recovered from Reflex mode")
+            except Exception as rec_err:
+                logger.warning(f"recover_from_errors() failed before retrying start: {rec_err}")
+            try:
+                motion = JointMotion(home_position_deg, ReferenceType.Absolute)
+                self.robot.move(motion, asynchronous=False)
+                time.sleep(0.1)
+            except Exception as retry_err:
+                logger.warning(f"Retrying start position failed: {retry_err}")
+                raise
 
     def reset_to_initial_position(self) -> None:
         """Reset robot to initial position based on config.go_to_start.
@@ -561,6 +580,19 @@ class FrankaResearch3(Robot):
         # Stop the impedance controller before issuing JointMotion: franky
         # refuses a different motion type while one is still running.
         self._stop_impedance_tracker()
+        try:
+            self.robot.stop()
+        except Exception as e:
+            logger.warning(f"robot.stop() before reset failed: {e}")
+        try:
+            self.robot.join_motion()
+        except Exception as e:
+            logger.warning(f"robot.join_motion() before reset failed: {e}")
+        try:
+            if getattr(self.robot, "has_errors", False):
+                self.robot.recover_from_errors()
+        except Exception as e:
+            logger.warning(f"recover_from_errors() before reset failed: {e}")
 
         if self.config.go_to_start:
             logger.info("Resetting to start position (config.go_to_start=True)")
@@ -568,6 +600,11 @@ class FrankaResearch3(Robot):
         else:
             logger.info("Resetting to home position (config.go_to_start=False)")
             self._go_to_home()
+
+        try:
+            self.robot.join_motion()
+        except Exception as e:
+            logger.warning(f"robot.join_motion() after reset failed: {e}")
 
         # Switch back to control mode after reset
         self._switch_to_control_mode()
