@@ -142,7 +142,7 @@ class FrankaResearch3Config(RobotConfig):
     # 左手心朝下，手指超前姿势
     # robot_home_position: list = field(default_factory=lambda: [ -0.09385, -0.17559,  0.02542, -2.05487,  0.028,    1.88188, -0.89032 ])
     # 左手心朝右，手指超前姿势
-    robot_home_position: list = field(default_factory=lambda: [ 0.40894 , 0.12128 , 0.0336 , -2.28866 , -1.10764 , 1.11151 , 0.2806 ])
+    robot_home_position: list = field(default_factory=lambda: [0.0, 0.0, 0.3, -2.4, -1.3, 1.4, 0.2])
 
     # ======================== Xense Gripper Configuration ========================
 
