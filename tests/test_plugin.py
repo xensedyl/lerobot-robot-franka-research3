@@ -19,3 +19,4 @@ def test_franka_research3_can_be_instantiated_without_gripper():
     assert "tcp.x" in robot.action_features
     assert "gripper.pos" not in robot.action_features
     assert "tcp.x" in robot.observation_features
+    assert "gripper.pos" not in robot.observation_features

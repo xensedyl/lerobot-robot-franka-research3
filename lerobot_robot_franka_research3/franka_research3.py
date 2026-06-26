@@ -237,7 +237,8 @@ class FrankaResearch3(Robot):
             raise ValueError(f"Unsupported control mode: {self.config.control_mode}")
         
         # Gripper: position (0.0=closed, 1.0=open)
-        features[self._gripper_key] = float
+        if self.config.use_gripper:
+            features[self._gripper_key] = float
         
         # Cameras
         for cam_name, cam_config in self.config.cameras.items():
